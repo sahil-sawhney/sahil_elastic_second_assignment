@@ -1,0 +1,98 @@
+<!doctype html>
+<html ng-app="demoModule">
+	<head>
+		<title>Intern Details</title>
+		<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="assets/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="internStyle.css">		
+		<meta charset="utf-8">
+  		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body>
+		<div >
+			<header class="container-fluid">
+			    <div class="row header">
+			        <p class="myHeader" Style="color:white">JSON Do - JSON Lo</p>
+			    </div>
+			</header>
+			<br><br><br><br><br>
+			<div ng-view></div>
+		</div>
+		
+		<script src="assets/js/jquery-2.2.0.min.js"></script>
+		<script src="assets/js/angular.min.js"></script>
+		<script src="assets/js/angular-route.min.js"></script>
+		<script src="assets/js/bootstrap.min.js"></script>
+		
+		<script>
+
+		var demoModule=angular.module('demoModule',['ngRoute']);
+
+			demoModule.config(function($routeProvider){
+				$routeProvider
+				.when('/',{
+					controller:'fetchCtrl',
+					templateUrl:'partial1.html'
+				})
+				.when('/v2',{
+					controller:'generateCtrl',
+					templateUrl:'partial2.html'
+				})
+				.otherwise({redirectTo:'/'});
+			});
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+			demoModule.controller('fetchCtrl', ['$scope','$location','fetchFactory','$routeParams',function($scope,$location, fetchFactory, $routeParams){
+
+			 	$scope.fetchJson=function(filePath){
+			 		$scope.msj="UPLOADING FILE..."
+					fetchFactory.fetchJson(filePath)
+            		.success(function () {
+						$location.path('/v2');
+            		})
+            		.error(function () {
+            			$scope.msj="file path is not correct"
+            		});
+            	}
+
+			}]);
+
+			 demoModule.factory('fetchFactory', ['$http',function($http){
+				var factory={};
+
+				factory.fetchJson=function(filePath){
+					return $http.get('http://localhost:9000/fetchJson?filePath='+filePath);
+				}
+				return factory;
+			}]);
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+			 demoModule.controller('generateCtrl', ['$scope','$location','generateFactory','$routeParams',function($scope,$location, generateFactory, $routeParams){
+
+			 	$scope.generateJson=function(folderPath){
+			 		$scope.msj="GENERATING FILE..."
+					generateFactory.generateJson(folderPath)
+            		.success(function () {
+						$location.path('/v1');
+            		})
+            		.error(function () {
+            			$scope.msj="folder path is not correct"
+            		});
+            	}
+
+			}]);
+
+			 demoModule.factory('generateFactory', ['$http',function($http){
+				var factory={};
+
+				factory.generateJson=function(folderPath){
+					return $http.get('http://localhost:9000/generateJson?folderPath='+folderPath);
+				}
+				return factory;
+			}]);
+
+		</script>
+	</body>
+</html>
